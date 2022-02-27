@@ -1,0 +1,87 @@
+name: 'Create-terraform-state-setup'
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  terraform-state:
+    name: 'CreateTerraformState'
+    runs-on: ubuntu-latest
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: terraform_state_setup
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.1.6
+        terraform_wrapper: false
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      id: init
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      run: terraform init
+
+    - name: Terraform Plan
+      id: plan
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      run: terraform plan
+
+    - name: Terraform apply
+      id: apply
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      run: terraform apply -auto-approve
+    
+    - name: Terraform get outputs
+      id: terraform-outputs
+      run: |
+          S3_STATE_BUCKET_NAME=$(terraform output --raw s3_state_bucket_name)
+          DYNAMODB_TABLE_NAME=$(terraform output --raw dynamodb_table_name)
+          echo "S3 bucket name: $S3_STATE_BUCKET_NAME"
+          echo "Dynamodb name : $DYNAMODB_TABLE_NAME"
+          sed -i 's/eu-west-1/${{ secrets.AWS_DEFAULT_REGION }}/g' ../backend.tf
+          sed -i 's/eu-west-1/${{ secrets.AWS_DEFAULT_REGION }}/g' ../variables.tf
+          sed -i s/servian-terraform-state/"$S3_STATE_BUCKET_NAME"/g ../backend.tf
+          sed -i s/servian-terraform-lock/"$DYNAMODB_TABLE_NAME"/g ../backend.tf
+
+    - name: Create Pull Request
+      id: cpr
+      uses: peter-evans/create-pull-request@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: Terraform State Create
+        committer: GitHub <noreply@github.com>
+        author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+        signoff: false
+        branch: terraform-state-setup
+        delete-branch: true
+        title: '[s3/dynamodb] Create setup for terrform state'
+        body: |
+          Created the following services in your AWS account in ${{ secrets.AWS_DEFAULT_REGION }} region:
+
+          S3 Bucket and DynamoBD settings updated in `backend.ft`
+          
+        labels: |
+          terraform-state
+          terraform
+        draft: false
+

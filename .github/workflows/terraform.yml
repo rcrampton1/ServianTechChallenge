@@ -1,0 +1,228 @@
+# This workflow installs the latest version of Terraform CLI and configures the Terraform CLI configuration file
+
+name: 'Terraform'
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.1.6
+
+    # Check file setup  
+    - name: Run terraform fmt check
+      id: fmt
+      run: terraform fmt -check -diff -recursive 
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      id: init
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      run: terraform init
+
+     # Validate output of terraform 
+    - name: Terraform Validate
+      id: validate
+      run: |
+          unset t_std t_err
+  
+          eval "$( terraform validate -no-color \
+                  2> >(t_err=$(cat); typeset -p t_err) \
+                   > >(t_std=$(cat); typeset -p t_std) )"
+  
+          t_err="${t_err//'%'/'%25'}"
+          t_err="${t_err//$'\n'/'%0A'}"
+          t_err="${t_err//$'\r'/'%0D'}"
+  
+          echo "::set-output name=stderr::$t_err"
+  
+          t_std="${t_std//'%'/'%25'}"
+          t_std="${t_std//$'\n'/'%0A'}"
+          t_std="${t_std//$'\r'/'%0D'}"
+  
+          echo "::set-output name=stdout::$t_std"
+    
+    # Run a terraform plan for pull requests only
+    - name: Terraform Plan
+      id: plan
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      if: github.event_name == 'pull_request'
+      continue-on-error: true
+      run: |
+          unset t_std t_err
+    
+          eval "$( terraform plan -no-color -var 'pr_number=${{ github.event.pull_request.number }}' \
+                  2> >(t_err=$(cat); typeset -p t_err) \
+                   > >(t_std=$(cat); typeset -p t_std) )"
+    
+          t_err="${t_err//'%'/'%25'}"
+          t_err="${t_err//$'\n'/'%0A'}"
+          t_err="${t_err//$'\r'/'%0D'}"
+    
+          echo "::set-output name=stderr::$t_err"
+    
+          t_std="${t_std//'%'/'%25'}"
+          t_std="${t_std//$'\n'/'%0A'}"
+          t_std="${t_std//$'\r'/'%0D'}"
+    
+          echo "::set-output name=stdout::$t_std"
+        
+     # Add a comment to pull requests with plan results
+    - name: add-plan-comment
+      id: comment
+      uses: actions/github-script@v3
+      if: github.event_name == 'pull_request'
+      env:
+        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+          #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+          #### Terraform Validation 🤖 ${{ steps.validate.outputs.stderr }}${{ steps.validate.outputs.stdout }}
+          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+      
+          <details>
+          
+          <summary>Show Plan</summary>
+          
+          \`\`\`${process.env.PLAN}
+          \`\`\`
+          
+          </details>
+
+          
+          **Pusher**: @${{ github.actor }}
+          **Action**: ${{ github.event_name }}
+          
+
+          Working Directory: ${{ env.tf_actions_working_dir }}
+          Workflow: \`${{ github.workflow }}\`*`;
+            
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
+
+    - name: Terraform Plan Status
+      if: steps.plan.outcome == 'failure'
+      run: exit 1
+    
+
+  deploy:
+    needs: terraform
+    name: Deploy from Plan
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    environment:
+      name: production
+    
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.1.6
+    
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      id: init
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      run: terraform init
+
+    # Run a terraform plan for pull requests only
+    - name: Terraform Plan
+      id: plan
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      continue-on-error: true
+      run: |
+          unset t_std t_err
+    
+          eval "$( terraform plan -no-color -var 'pr_number=${{ github.event.pull_request.number }}' \
+                  2> >(t_err=$(cat); typeset -p t_err) \
+                   > >(t_std=$(cat); typeset -p t_std) )"
+    
+          t_err="${t_err//'%'/'%25'}"
+          t_err="${t_err//$'\n'/'%0A'}"
+          t_err="${t_err//$'\r'/'%0D'}"
+    
+          echo "::set-output name=stderr::$t_err"
+    
+          t_std="${t_std//'%'/'%25'}"
+          t_std="${t_std//$'\n'/'%0A'}"
+          t_std="${t_std//$'\r'/'%0D'}"
+    
+          echo "::set-output name=stdout::$t_std"
+    
+    # On push to main, build or change infrastructure according to Terraform configuration files
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      env:
+       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+       AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      run: terraform apply -auto-approve
+
+    - name: Terraform get outputs
+      id: terraform-outputs
+      run: |
+          echo "::set-output name=APPLICATION_URL::$(terraform output -raw application_url)"
+
+    - name: Comment PR with URL
+      uses: actions/github-script@0.9.0
+      if: github.event.action == 'opened' || github.event.action == 'reopened'
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+            const output = `#### Feature environment URL:
+            ${{ steps.terraform-outputs.outputs.APPLICATION_URL }}`;
+      
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
