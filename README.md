@@ -1,9 +1,9 @@
-[![Terraform](https://github.com/rcrampton1/Servian_TechChallenge/actions/workflows/terraform.yml/badge.svg)](https://github.com/rcrampton1/Servian_TechChallenge/actions/workflows/terraform.yml)
+[![Terraform](https://github.com/rcrampton1/Servian_Tech_Challenge/actions/workflows/terraform.yml/badge.svg)](https://github.com/rcrampton1/Servian_Tech_Challenge/actions/workflows/terraform.yml)
 
-# Servian_TechChallenge
+# Servian_Tech_Challenge
  AWS with Terraform for the solution of the Servian Tech challenge
 
-# Pre requisites or Requirements for the solution
+# Pre-requisites for the solution
 
 All Requirements:
 - Internet connection 
@@ -14,27 +14,31 @@ All Requirements:
 
 Local Requirements:
 - Terraform installed (tested with Terraform v1.1.6)
-- AWS CLi installed
+- AWS CLI installed
 
-Running via Github Actions
+Github Actions Requirements:
 - access to `Settings >> Actions secrets`
 - Free GitHub Actions Minutes
 
-# Architecture diagram
+# Architecture Diagram
 
 <p align="center">
-A range of tools have been selected for this solution to try and meet the brief
+A range of tools have been selected for this solution to meet the brief
 
 ![readme_infra.png](readme_infra.png)
 
 Tools selected : Cloudfront, AWS Secrets Manager, Application load balancer, ECS with Fargate, RDS Amazon Aurora and Cloud Watch
 <p align="center">
 
+# Network Diagram
+
+
+
 # Files in solution
 
 ``` sh
 .
-├── main.tf               # Contains configuration 
+├── main.tf               # Contains main configuration 
 ├── backend.tf            # Contains defined variables
 ├── cloudfront.tf         # Contains defined variables
 ├── data.tf               # Contains defined variables
@@ -88,11 +92,11 @@ Cost estimate was created with the AWS Pricing Calculator with eu-west-1 selecte
 
 To deploy the infrastructure to support the Servian Application please follow these stages:
 
-Check you have met the following requirements [here](#Pre-requisites-or-Requirements-for-the-solution)
+Check you have met the following Pe-requisites [here](#Pre-requisites-for-the-solution)
 
 # Run by Pipeline 
 
-If you want to run this via a CI tool, I have given example with Github workflow but this could be another tool like Jenkins/Teamcity etc.
+If you want to run this via a CI tool, I have given an example with Github workflow, but an alternative tool could be e.g. Jenkins/Teamcity etc.
 
 1. Sign into Github with your account
 2. Clone/fork this repo
@@ -104,24 +108,28 @@ AWS_SECRET_ACCESS_KEY = Testkey
 AWS_DEFAULT_REGION = eu-west-1 (your selected region)
 ```
 
-You can place these in the `settings >> security >> secrets >> actions`
+You can place these in the `settings >> security >> secrets >> actions` as shown in the diagram 
 
 ![readme_settings.png](readme_settings.png)
 
 
-3. Once all the above steps are complete, please go to the `Action Tab` you will have to enable workflows on the forked repo ,you will see a message like below - select `I understand my workflows, go ahead and enable them`
+4. Once all the above steps are complete, please go to the `Action Tab` to enable workflows on the forked repo. You will see a message as shown in the diagram below. Select `I understand my workflows, go ahead and enable them`
 
 ![readme_forked_message.png](readme_forked_message.png) 
 
-4. Run the first provisioning script for terraform state, only needs to be run once (creating S3 bucket and Dynamodb table) 1. `Actions` >> `Workflows` >> 2. `Create-terraform-state-setup` >> `Run workflow` drop down >> `Run workflow`    
+5. Run the first provisioning script for terraform state. This only needs to be run once (creating S3 bucket and Dynamodb table) 
+   go to 
+   1. `Actions` >> `Workflows` >> 2. `Create-terraform-state-setup` >> `Run workflow` drop down >> `Run workflow`    
 
 ![readme_workflows.png](readme_workflows.png)
 
-4. Once you have successfully run the `Create-terraform-state-setup` you will see a new branch created with the s3 bucket and Dynamodb settings/names added to the `backend.tf` on branch `terraform-state-setup` create a branch from this repo and create a PR
+6. Once you have successfully run the `Create-terraform-state-setup` you will see a new branch created with the s3 bucket and Dynamodb settings added to the `backend.tf` on branch `terraform-state-setup` 
+
+7. Create a new branch from `Create-terraform-state-setup` and create a PR
 
 ![readme_branch.png](readme_branch.png)
 
 
-5. If you are happy with the Terraform plan you can merge to master this will peform the `Terraform apply`
+8. If you are happy with the Terraform plan you can merge to master. This will peform the `Terraform apply`
 
 ![readme_githubbot.png](readme_githubbot.png)
