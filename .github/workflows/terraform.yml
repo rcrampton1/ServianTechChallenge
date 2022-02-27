@@ -1,5 +1,5 @@
 # This workflow installs the latest version of Terraform CLI and configures the Terraform CLI configuration file
-
+# Ref : https://www.terraform.io/language/values/outputs
 name: 'Terraform'
 
 on:
@@ -46,24 +46,7 @@ jobs:
      # Validate output of terraform 
     - name: Terraform Validate
       id: validate
-      run: |
-          unset t_std t_err
-  
-          eval "$( terraform validate -no-color \
-                  2> >(t_err=$(cat); typeset -p t_err) \
-                   > >(t_std=$(cat); typeset -p t_std) )"
-  
-          t_err="${t_err//'%'/'%25'}"
-          t_err="${t_err//$'\n'/'%0A'}"
-          t_err="${t_err//$'\r'/'%0D'}"
-  
-          echo "::set-output name=stderr::$t_err"
-  
-          t_std="${t_std//'%'/'%25'}"
-          t_std="${t_std//$'\n'/'%0A'}"
-          t_std="${t_std//$'\r'/'%0D'}"
-  
-          echo "::set-output name=stdout::$t_std"
+      run: terraform validate -no-color
     
     # Run a terraform plan for pull requests only
     - name: Terraform Plan
@@ -73,25 +56,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       if: github.event_name == 'pull_request'
+      run: terraform plan -no-color
       continue-on-error: true
-      run: |
-          unset t_std t_err
-    
-          eval "$( terraform plan -no-color -var 'pr_number=${{ github.event.pull_request.number }}' \
-                  2> >(t_err=$(cat); typeset -p t_err) \
-                   > >(t_std=$(cat); typeset -p t_std) )"
-    
-          t_err="${t_err//'%'/'%25'}"
-          t_err="${t_err//$'\n'/'%0A'}"
-          t_err="${t_err//$'\r'/'%0D'}"
-    
-          echo "::set-output name=stderr::$t_err"
-    
-          t_std="${t_std//'%'/'%25'}"
-          t_std="${t_std//$'\n'/'%0A'}"
-          t_std="${t_std//$'\r'/'%0D'}"
-    
-          echo "::set-output name=stdout::$t_std"
         
      # Add a comment to pull requests with plan results
     - name: add-plan-comment
@@ -105,7 +71,7 @@ jobs:
         script: |
           const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
           #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-          #### Terraform Validation 🤖 ${{ steps.validate.outputs.stderr }}${{ steps.validate.outputs.stdout }}
+          #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
           #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
       
           <details>
