@@ -72,7 +72,7 @@ variable "app_port" {
 
 
 #------------------------------------------------
-# Database Vars 
+# Database Vars -
 #------------------------------------------------
 
 variable "rds_engine" {
