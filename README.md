@@ -25,13 +25,14 @@ Github Actions Requirements:
 <p align="center">
 A range of tools have been selected for this solution to meet the brief
 
-![readme_infra.png](readme_infra.png)
+![readme_infra.png](readme_images/readme_infra.png)
 
 Tools selected : Cloudfront, AWS Secrets Manager, Application load balancer, ECS with Fargate, RDS Amazon Aurora and Cloud Watch
 <p align="center">
 
 # Network Diagram
 
+![readme_infra.png](readme_images/readme_network.png)
 
 
 # Files in solution
@@ -108,28 +109,30 @@ AWS_SECRET_ACCESS_KEY = Testkey
 AWS_DEFAULT_REGION = eu-west-1 (your selected region)
 ```
 
-You can place these in the `settings >> security >> secrets >> actions` as shown in the [diagram](readme_settings.png) 
+You can place these in the `settings >> security >> secrets >> actions` as shown in the [diagram](readme_images/readme_settings.png) 
 
 
-4. Once all the above steps are complete, please go to the `Action Tab` to enable workflows on the forked repo. You will see a message as shown in the diagram below. Select `I understand my workflows, go ahead and enable them` [image example here](readme_forked_message.png) 
+4. Once all the above steps are complete, please go to the `Action Tab` to enable workflows on the forked repo. You will see a message as shown in the diagram below. Select `I understand my workflows, go ahead and enable them` [image example here](readme_images/readme_forked_message.png) 
 
 
 5. Run the first provisioning script for terraform state. This only needs to be run once (creating S3 bucket and Dynamodb table) 
    go to :
    1. `Actions` >> `Workflows` >> 2. `Create-terraform-state-setup` >> `Run workflow` drop down >> `Run workflow`    
 
-![readme_workflows.png](readme_workflows.png)
+![readme_workflows.png](readme_images/readme_workflows.png)
 
 6. Once you have successfully run the `Create-terraform-state-setup` you will see a new branch created with the s3 bucket and Dynamodb settings added to the `backend.tf` on branch `terraform-state-setup` 
 
 7. Create a new branch from `Create-terraform-state-setup` and create a PR (workaround as bot PRs can't be picked up from Workflow)
 
-![readme_branch.png](readme_branch.png)
+![readme_branch.png](readme_images/readme_branch.png)
 
 8. You will see the output of the terraform plan added to the comments on the PR for review of the `Terraform plan`
 
-![readme_githubbot.png](readme_githubbot.png)
+![readme_githubbot.png](readme_images/readme_githubbot.png)
 
 9. If you are happy with the Terraform plan you can merge to master `merge pull request`. This will peform the `Terraform apply`
 
 10. To get the application url you will be able to see the workflow step `Application URL`
+
+![readme_githubbot.png](readme_images/readme_url.png)
