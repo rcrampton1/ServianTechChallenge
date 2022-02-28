@@ -25,33 +25,14 @@ Github Actions Requirements:
 <p align="center">
 A range of tools have been selected for this solution to meet the brief
 
-![readme_infra.png](readme_infra.png)
+![readme_infra.png](readme_images/readme_infra.png)
 
 Tools selected : Cloudfront, AWS Secrets Manager, Application load balancer, ECS with Fargate, RDS Amazon Aurora and Cloud Watch
 <p align="center">
 
 # Network Diagram
 
-
-
-# Files in solution
-
-``` sh
-.
-├── main.tf               # Contains main configuration 
-├── backend.tf            # Contains defined variables
-├── cloudfront.tf         # Contains defined variables
-├── data.tf               # Contains defined variables
-├── ecs.tf                # Contains defined variables
-├── output.tf             # Contains defined variables
-├── provider.tf           # Contains defined variables
-├── rds.tf                # Contains defined variables
-├── variables.tf          # Contains defined variables
-├── modules/network       # Contains defined variables
-├── terraform_state_setup # Contains defined variables
-└── data.tf               # Collect info on the account
-```
-
+![readme_infra.png](readme_images/readme_network.png)
 
 # Monthly cost estimate
 Cost estimate was created with the AWS Pricing Calculator with eu-west-1 selected to give an estimated running cost for the solution: https://calculator.aws/#/estimate
@@ -94,7 +75,7 @@ To deploy the infrastructure to support the Servian Application please follow th
 
 Check you have met the following Pe-requisites [here](#Pre-requisites-for-the-solution)
 
-# Run by Pipeline 
+### Run by Pipeline 
 
 If you want to run this via a CI tool, I have given an example with Github workflow, but an alternative tool could be e.g. Jenkins/Teamcity etc.
 
@@ -108,28 +89,32 @@ AWS_SECRET_ACCESS_KEY = Testkey
 AWS_DEFAULT_REGION = eu-west-1 (your selected region)
 ```
 
-You can place these in the `settings >> security >> secrets >> actions` as shown in the [diagram](readme_settings.png) 
+You can place these in the `settings >> security >> secrets >> actions` as shown in the [diagram](readme_images/readme_settings.png) 
 
 
-4. Once all the above steps are complete, please go to the `Action Tab` to enable workflows on the forked repo. You will see a message as shown in the diagram below. Select `I understand my workflows, go ahead and enable them` [image example here](readme_forked_message.png) 
+4. Once all the above steps are complete, please go to the `Action Tab` to enable workflows on the forked repo. You will see a message as shown in the diagram below. Select `I understand my workflows, go ahead and enable them` [image example here](readme_images/readme_forked_message.png) 
 
 
 5. Run the first provisioning script for terraform state. This only needs to be run once (creating S3 bucket and Dynamodb table) 
    go to :
-   1. `Actions` >> `Workflows` >> 2. `Create-terraform-state-setup` >> `Run workflow` drop down >> `Run workflow`    
-
-![readme_workflows.png](readme_workflows.png)
+   1. `Actions` 
+   2. `Create-terraform-state-setup`
+   3. `Run workflow` (drop down) 
+   4. `Run workflow` (button)   
+   [Printscreen example](readme_images/readme_workflows.png)
 
 6. Once you have successfully run the `Create-terraform-state-setup` you will see a new branch created with the s3 bucket and Dynamodb settings added to the `backend.tf` on branch `terraform-state-setup` 
 
-7. Create a new branch from `Create-terraform-state-setup` and create a PR (workaround as bot PRs can't be picked up from Workflow)
-
-![readme_branch.png](readme_branch.png)
+7. Create a new branch from `Create-terraform-state-setup` and create a PR (workaround as bot PRs can't be picked up from Workflow) Example of create a new branch [here](readme_images/readme_branch.png)
 
 8. You will see the output of the terraform plan added to the comments on the PR for review of the `Terraform plan`
 
-![readme_githubbot.png](readme_githubbot.png)
+![readme_githubbot.png](readme_images/readme_githubbot.png)
 
 9. If you are happy with the Terraform plan you can merge to master `merge pull request`. This will peform the `Terraform apply`
 
-10. To get the application url you will be able to see the workflow step `Application URL`
+10. To get the application url you will be able to see this in the workflow output
+     1. select the green tick at the top of the repo
+     2. click on the Details for [Terraform / Deploy from Plan (push)](readme_images/readme_run.png)
+     3. Open `Application URL` [Get Application URL](readme_images/readme_url.png)
+

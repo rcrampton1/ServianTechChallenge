@@ -1,9 +1,9 @@
 #------------------------------------------------
-# System and General variables
+# System General variables and network settings
 #------------------------------------------------
 
 variable "region" {
-  default = "eu-west-2"
+  default = "eu-west-1"
 }
 
 variable "common_name" {
