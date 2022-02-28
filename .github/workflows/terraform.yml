@@ -31,7 +31,6 @@ jobs:
       uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: 1.1.6
-        terraform_wrapper: false
 
     # Check file setup  
     - name: Run terraform fmt check
@@ -162,6 +161,10 @@ jobs:
 
     - name: Application URL
       id: terraform-output
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       run: |
           APPLICATION_URL_SERVIAN=$(terraform output --raw application_url)
           echo "Application URL : APPLICATION_URL_SERVIAN"
