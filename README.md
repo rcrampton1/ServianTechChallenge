@@ -97,9 +97,11 @@ You can place these in the `settings >> security >> secrets >> actions` as shown
 
 5. Run the first provisioning script for terraform state. This only needs to be run once (creating S3 bucket and Dynamodb table) 
    go to :
-   1. `Actions` >> `Workflows` >> 2. `Create-terraform-state-setup` >> `Run workflow` drop down >> `Run workflow`    
-
-![readme_workflows.png](readme_images/readme_workflows.png)
+   1. `Actions` 
+   2. `Create-terraform-state-setup`
+   3. `Run workflow` (drop down) 
+   4. `Run workflow` (button)   
+   [Printscreen example](readme_images/readme_workflows.png)
 
 6. Once you have successfully run the `Create-terraform-state-setup` you will see a new branch created with the s3 bucket and Dynamodb settings added to the `backend.tf` on branch `terraform-state-setup` 
 
@@ -111,6 +113,7 @@ You can place these in the `settings >> security >> secrets >> actions` as shown
 
 9. If you are happy with the Terraform plan you can merge to master `merge pull request`. This will peform the `Terraform apply`
 
-10. To get the application url you will be able to see the workflow step `Application URL`
-
-![readme_githubbot.png](readme_images/readme_url.png)
+10. To get the application url you will be able to see this in the workflow output
+     1. select the green tick at the top of the repo
+     2. click on the Details for [Terraform / Deploy from Plan (push)](readme_images/readme_run.png)
+     3. Open `Application URL` [Get Application URL](readme_images/readme_url.png)
