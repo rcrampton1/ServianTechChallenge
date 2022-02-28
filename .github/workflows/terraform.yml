@@ -167,4 +167,4 @@ jobs:
         AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       run: |
           APPLICATION_URL_SERVIAN=$(terraform output --raw application_url)
-          echo "Application URL : APPLICATION_URL_SERVIAN"
+          echo "Application URL : $APPLICATION_URL_SERVIAN"
