@@ -130,6 +130,7 @@ jobs:
       uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: 1.1.6
+        terraform_wrapper: false
     
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
@@ -160,23 +161,7 @@ jobs:
       run: terraform apply -auto-approve
 
     - name: Application URL
-      id: terraform-outputs
+      id: terraform-output
       run: |
-          APPLICATION_URL=$(terraform output --raw application_url)
-          echo "Application URL : $APPLICATION_URL"
-
-    - name: Comment PR with URL
-      uses: actions/github-script@0.9.0
-      if: github.event.action == 'opened' || github.event.action == 'reopened'
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-            const output = `#### Feature environment URL:
-            ${{ steps.terraform-outputs.outputs.APPLICATION_URL }}`;
-      
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+          APPLICATION_URL_SERVIAN=$(terraform output --raw application_url)
+          echo "Application URL : APPLICATION_URL_SERVIAN"
