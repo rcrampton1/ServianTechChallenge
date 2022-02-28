@@ -51,6 +51,7 @@ jobs:
         AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       run: terraform apply -auto-approve
     
+    # Work around for updating users aws account details
     - name: Terraform get outputs
       id: terraform-outputs
       run: |

@@ -147,24 +147,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       continue-on-error: true
-      run: |
-          unset t_std t_err
-    
-          eval "$( terraform plan -no-color -var 'pr_number=${{ github.event.pull_request.number }}' \
-                  2> >(t_err=$(cat); typeset -p t_err) \
-                   > >(t_std=$(cat); typeset -p t_std) )"
-    
-          t_err="${t_err//'%'/'%25'}"
-          t_err="${t_err//$'\n'/'%0A'}"
-          t_err="${t_err//$'\r'/'%0D'}"
-    
-          echo "::set-output name=stderr::$t_err"
-    
-          t_std="${t_std//'%'/'%25'}"
-          t_std="${t_std//$'\n'/'%0A'}"
-          t_std="${t_std//$'\r'/'%0D'}"
-    
-          echo "::set-output name=stdout::$t_std"
+      run: terraform plan -no-color
     
     # On push to main, build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
@@ -175,10 +158,11 @@ jobs:
        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       run: terraform apply -auto-approve
 
-    - name: Terraform get outputs
+    - name: Application URL
       id: terraform-outputs
       run: |
-          echo "::set-output name=APPLICATION_URL::$(terraform output -raw application_url)"
+          APPLICATION_URL=$(terraform output --raw application_url)
+          echo "Application URL : $APPLICATION_URL"
 
     - name: Comment PR with URL
       uses: actions/github-script@0.9.0

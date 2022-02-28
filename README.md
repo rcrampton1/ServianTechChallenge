@@ -1,4 +1,4 @@
-[![Terraform](https://github.com/rcrampton1/Servian_Tech_Challenge/actions/workflows/terraform.yml/badge.svg)](https://github.com/rcrampton1/Servian_Tech_Challenge/actions/workflows/terraform.yml)
+[![Terraform](https://github.com/rcrampton1/ServianTechChallenge/actions/workflows/terraform.yml/badge.svg)](https://github.com/rcrampton1/ServianTechChallenge/actions/workflows/terraform.yml)
 
 # Servian_Tech_Challenge
  AWS with Terraform for the solution of the Servian Tech challenge
@@ -125,11 +125,14 @@ You can place these in the `settings >> security >> secrets >> actions` as shown
 
 6. Once you have successfully run the `Create-terraform-state-setup` you will see a new branch created with the s3 bucket and Dynamodb settings added to the `backend.tf` on branch `terraform-state-setup` 
 
-7. Create a new branch from `Create-terraform-state-setup` and create a PR
+7. Create a new branch from `Create-terraform-state-setup` and create a PR (workaround as bot PRs can't be picked up from Workflow)
 
 ![readme_branch.png](readme_branch.png)
 
-
-8. If you are happy with the Terraform plan you can merge to master. This will peform the `Terraform apply`
+8. You will see the output of the terraform plan added to the comments on the PR for review of the `Terraform plan`
 
 ![readme_githubbot.png](readme_githubbot.png)
+
+9. If you are happy with the Terraform plan you can merge to master. This will peform the `Terraform apply`
+
+10. To get the application url you will be able to see the workflow step `Application URL`
