@@ -108,17 +108,14 @@ AWS_SECRET_ACCESS_KEY = Testkey
 AWS_DEFAULT_REGION = eu-west-1 (your selected region)
 ```
 
-You can place these in the `settings >> security >> secrets >> actions` as shown in the diagram 
-
-![readme_settings.png](readme_settings.png)
+You can place these in the `settings >> security >> secrets >> actions` as shown in the [diagram](readme_settings.png) 
 
 
-4. Once all the above steps are complete, please go to the `Action Tab` to enable workflows on the forked repo. You will see a message as shown in the diagram below. Select `I understand my workflows, go ahead and enable them`
+4. Once all the above steps are complete, please go to the `Action Tab` to enable workflows on the forked repo. You will see a message as shown in the diagram below. Select `I understand my workflows, go ahead and enable them` [image example here](readme_forked_message.png) 
 
-![readme_forked_message.png](readme_forked_message.png) 
 
 5. Run the first provisioning script for terraform state. This only needs to be run once (creating S3 bucket and Dynamodb table) 
-   go to 
+   go to :
    1. `Actions` >> `Workflows` >> 2. `Create-terraform-state-setup` >> `Run workflow` drop down >> `Run workflow`    
 
 ![readme_workflows.png](readme_workflows.png)
@@ -133,6 +130,6 @@ You can place these in the `settings >> security >> secrets >> actions` as shown
 
 ![readme_githubbot.png](readme_githubbot.png)
 
-9. If you are happy with the Terraform plan you can merge to master. This will peform the `Terraform apply`
+9. If you are happy with the Terraform plan you can merge to master `merge pull request`. This will peform the `Terraform apply`
 
 10. To get the application url you will be able to see the workflow step `Application URL`
