@@ -34,26 +34,6 @@ Tools selected : Cloudfront, AWS Secrets Manager, Application load balancer, ECS
 
 ![readme_infra.png](readme_images/readme_network.png)
 
-
-# Files in solution
-
-``` sh
-.
-├── main.tf               # Contains main configuration 
-├── backend.tf            # Contains defined variables
-├── cloudfront.tf         # Contains defined variables
-├── data.tf               # Contains defined variables
-├── ecs.tf                # Contains defined variables
-├── output.tf             # Contains defined variables
-├── provider.tf           # Contains defined variables
-├── rds.tf                # Contains defined variables
-├── variables.tf          # Contains defined variables
-├── modules/network       # Contains defined variables
-├── terraform_state_setup # Contains defined variables
-└── data.tf               # Collect info on the account
-```
-
-
 # Monthly cost estimate
 Cost estimate was created with the AWS Pricing Calculator with eu-west-1 selected to give an estimated running cost for the solution: https://calculator.aws/#/estimate
 
@@ -123,9 +103,7 @@ You can place these in the `settings >> security >> secrets >> actions` as shown
 
 6. Once you have successfully run the `Create-terraform-state-setup` you will see a new branch created with the s3 bucket and Dynamodb settings added to the `backend.tf` on branch `terraform-state-setup` 
 
-7. Create a new branch from `Create-terraform-state-setup` and create a PR (workaround as bot PRs can't be picked up from Workflow)
-
-![readme_branch.png](readme_images/readme_branch.png)
+7. Create a new branch from `Create-terraform-state-setup` and create a PR (workaround as bot PRs can't be picked up from Workflow) Example of create a new branch [here](readme_images/readme_branch.png)
 
 8. You will see the output of the terraform plan added to the comments on the PR for review of the `Terraform plan`
 
