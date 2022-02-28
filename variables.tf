@@ -1,5 +1,5 @@
 #------------------------------------------------
-# System and General variables
+# System General variables and network settings
 #------------------------------------------------
 
 variable "region" {

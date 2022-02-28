@@ -7,7 +7,7 @@ variable "project" {
 }
 
 variable "environment" {
-  description = "The deployment environment"
+  description = "The deployment environment tags"
 }
 
 variable "region" {

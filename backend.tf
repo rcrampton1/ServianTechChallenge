@@ -1,3 +1,7 @@
+#------------------------------------------------
+# To setup state for terraform
+#------------------------------------------------
+
 terraform {
   backend "s3" {
     bucket = "servian-terraform-state" #hard coded look to replace

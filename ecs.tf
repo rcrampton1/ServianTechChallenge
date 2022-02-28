@@ -144,7 +144,7 @@ resource "aws_ecs_task_definition" "rds" {
 #------------------------------------------------
 # ECS service DBA
 # - needs more research into tasks/ but doesn't 
-#   look supported in terraform yet 
+#   look supported in terraform yet - will keep clearing db
 #------------------------------------------------
 
 resource "aws_ecs_service" "rds" {
@@ -239,38 +239,3 @@ resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
     target_value = 80
   }
 }
-
-
-#------------------------------------------------
-# ECR 
-#------------------------------------------------
-
-# Todo - look at creating ECR so not pulling directly from Dockerhub
-
-#resource "aws_ecr_repository" "ecr" {
-#  name                 = "${var.common_name}-ecr"
-#  image_tag_mutability = "MUTABLE"
-#
-#  image_scanning_configuration {
-#    scan_on_push = true
-#  }
-#}
-#
-#resource "aws_ecr_lifecycle_policy" "main" {
-#  repository = aws_ecr_repository.ecr.name
-#
-#  policy = jsonencode({
-#    rules = [{
-#      rulePriority = 1
-#      description  = "keep last 10 images"
-#      action = {
-#        type = "expire"
-#      }
-#      selection = {
-#        tagStatus   = "any"
-#        countType   = "imageCountMoreThan"
-#        countNumber = 10
-#      }
-#    }]
-#  })
-#}

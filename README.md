@@ -75,7 +75,7 @@ To deploy the infrastructure to support the Servian Application please follow th
 
 Check you have met the following Pe-requisites [here](#Pre-requisites-for-the-solution)
 
-# Run by Pipeline 
+### Run by Pipeline 
 
 If you want to run this via a CI tool, I have given an example with Github workflow, but an alternative tool could be e.g. Jenkins/Teamcity etc.
 
@@ -117,3 +117,4 @@ You can place these in the `settings >> security >> secrets >> actions` as shown
      1. select the green tick at the top of the repo
      2. click on the Details for [Terraform / Deploy from Plan (push)](readme_images/readme_run.png)
      3. Open `Application URL` [Get Application URL](readme_images/readme_url.png)
+
